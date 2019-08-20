@@ -107,3 +107,6 @@ pyvenv.cfg
 
 # PyCharm files
 .idea/
+
+# Test file
+main.py

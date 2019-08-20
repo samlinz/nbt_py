@@ -2,12 +2,19 @@ from nbt_py.core import NBTTag, TagTypes
 
 
 def is_gzipped(filepath):
+    """
+    Check if the file at given path is gzip encoded.
+    :param filepath: File path to check.
+    :return: True if file is compressed with GZIP.
+    """
+
     MAGIC_NUMBER = '1f8b'
     with open(filepath, 'rb') as f:
         first_two_bytes = f.read(2).hex()
     return first_two_bytes == MAGIC_NUMBER
 
-def nbt_to_dict(nbt_tag : NBTTag):
+
+def nbt_to_dict(nbt_tag: NBTTag):
     """
     Convert NBT tag into python dictionary.
     All NBT compound types will be transformed into nested Python dictionaries.
@@ -22,6 +29,7 @@ def nbt_to_dict(nbt_tag : NBTTag):
         result[member.name] = nbt_to_dict(member) if is_compound else member.payload
 
     return result
+
 
 def __get_full_qualified_name(nb_tag, FULLY_QUALIFIED_SEPARATOR=None):
     """

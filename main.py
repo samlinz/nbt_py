@@ -15,7 +15,7 @@ gzipped = is_gzipped(FILE)
 parsed = load_and_parse_nbt_file(FILE)
 asd = find_tags(parsed, name_like='raining')[0]
 asd.payload = 1
-save_nbt_file(parsed, 'sibale.sav', override=True)
+save_nbt_file(parsed, 'sibale.sav', override=True, create_backup=False)
 parsed2 = load_and_parse_nbt_file(FILE)
 parsed3 = load_and_parse_nbt_file('sibale.sav')
 
