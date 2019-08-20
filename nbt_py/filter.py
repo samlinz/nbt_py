@@ -1,8 +1,10 @@
-from nbt_py.core import FULLY_QUALIFIED_SEPARATOR, TagTypes
-from nbt_py.util import __get_full_qualified_name
+from typing import Dict, Optional, List
+
+from nbt_py.core import FULLY_QUALIFIED_SEPARATOR, TagTypes, NBTTag
+from nbt_py.util import _get_full_qualified_name
 
 
-def get_lookup(nbt_tag, *, all_fully_qualified=False):
+def get_lookup(nbt_tag: NBTTag, *, all_fully_qualified: bool = False) -> Dict[str, NBTTag]:
     """
     Get a flattened lookup dictionary of the whole nested NBT tag structure.
     Tag names will be the keys and NBTTag objects the values.
@@ -23,7 +25,7 @@ def get_lookup(nbt_tag, *, all_fully_qualified=False):
 
     if name:
         if all_fully_qualified:
-            name = __get_full_qualified_name(nbt_tag)
+            name = _get_full_qualified_name(nbt_tag)
         result[name] = nbt_tag
 
     if type == TagTypes.TAG_Compound:
@@ -35,15 +37,20 @@ def get_lookup(nbt_tag, *, all_fully_qualified=False):
                         raise ValueError(
                             f'Duplicate fully qualified name {child_key}')
                     existing_duplicate = result.pop(child_key)
-                    result[__get_full_qualified_name(existing_duplicate)] = existing_duplicate
-                    result[__get_full_qualified_name(child_value)] = child_value
+                    result[_get_full_qualified_name(existing_duplicate)] = existing_duplicate
+                    result[_get_full_qualified_name(child_value)] = child_value
                 else:
                     result[child_key] = child_value
 
     return result
 
 
-def find_tags(nbt_tag, *, name_like=None, parents_like=None, types=None, case_insensitive=True):
+def find_tags(nbt_tag: NBTTag
+              , *
+              , name_like: Optional[str] = None
+              , parents_like: Optional[str] = None
+              , types: Optional[List[TagTypes]] = None
+              , case_insensitive: bool = True) -> List[NBTTag]:
     """
     Find tags using several filters.
     :param nbt_tag: Tag from which the search will begin.

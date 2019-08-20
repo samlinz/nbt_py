@@ -1,10 +1,11 @@
 import struct
+from typing import Tuple, Optional, Any
 
 from nbt_py.core import TagTypes, EMPTY_NAME, NBTTag, INTEGER_TYPES, \
     TAG_TYPE_BYTE_LENGTHS, ENDIANESS, LIST_TYPES
 
 
-def __read_nbt_string(file):
+def __read_nbt_string(file) -> str:
     """
     Read a string from open NBT file.
     Strings have their length first, then the UTF-8 encoded binary string.
@@ -30,7 +31,7 @@ def __read_nbt_string(file):
     return str
 
 
-def __write_nbt_string(file, str):
+def __write_nbt_string(file, str: str) -> None:
     """
     Write Python string into NBT binary format.
     :param file: Open file pointer.
@@ -48,10 +49,8 @@ def __write_nbt_string(file, str):
     str = struct.pack(f'>{length}s', str.encode('utf-8'))
     file.write(str)
 
-    return str
 
-
-def __read_nbt_int(file, byte_length, signed=True):
+def __read_nbt_int(file, byte_length: int, signed: bool = True) -> int:
     """
     Read N-byte integer value from NBT file.
 
@@ -64,7 +63,7 @@ def __read_nbt_int(file, byte_length, signed=True):
     return int.from_bytes(data, ENDIANESS, signed=signed)
 
 
-def __write_nbt_int(file, value: int, byte_length, *, signed=True):
+def __write_nbt_int(file, value: int, byte_length: int, *, signed: bool = True) -> None:
     """
     Write Python integer value into NBT binary format.
     :param file: Open file pointer.
@@ -76,7 +75,7 @@ def __write_nbt_int(file, value: int, byte_length, *, signed=True):
     file.write(int_bytes)
 
 
-def __read_tag_payload(file, tag_type):
+def __read_tag_payload(file, tag_type: TagTypes) -> Tuple[Any, Optional[TagTypes]]:
     """
     Read NBT tag's payload, knowing the type.
     :param file: Open file pointer.
@@ -148,7 +147,7 @@ def __read_tag_payload(file, tag_type):
         children = []
 
         while get_next:
-            child = __parse_tag(file)
+            child = _read_tag(file)
             if child.type == TagTypes.TAG_End:
                 # Stop getting children for compound type.
                 get_next = False
@@ -160,7 +159,7 @@ def __read_tag_payload(file, tag_type):
         return children, None
 
 
-def __parse_tag_content(file, tag_type):
+def __parse_tag_content(file, tag_type: TagTypes) -> NBTTag:
     """
     Read and parse tag's (nested) content and return a representative
     NBTTag object.
@@ -192,21 +191,7 @@ def __parse_tag_content(file, tag_type):
     return result
 
 
-def __parse_tag(file):
-    """
-    Parse a tag at the open file pointer's location, return NBTTag object.
-    :param file: Open file pointer pointing to the starting location of a new tag.
-    :return: NBTTag object.
-    """
-
-    # Read and parse tag type into enum member.
-    byte_tag_type = __read_nbt_int(file, 1)
-    tag_type = TagTypes(byte_tag_type)
-
-    return __parse_tag_content(file, tag_type)
-
-
-def __write_tag_payload(file, nbt_tag):
+def __write_tag_payload(file, nbt_tag: NBTTag) -> None:
     """
     Write tag's payload.
     :param file: Open file pointer.
@@ -277,15 +262,29 @@ def __write_tag_payload(file, nbt_tag):
 
     if tag_type == TagTypes.TAG_Compound:
         for child in payload:
-            __write_tag(file, child)
+            _write_tag(file, child)
 
         # Write compound ending tag.
-        __write_tag(file, NBTTag.create(TagTypes.TAG_End, None, None))
+        _write_tag(file, NBTTag.create(TagTypes.TAG_End, None, None))
 
         return
 
 
-def __write_tag(file, nbt_tag):
+def _read_tag(file) -> NBTTag:
+    """
+    Parse a tag at the open file pointer's location, return NBTTag object.
+    :param file: Open file pointer pointing to the starting location of a new tag.
+    :return: NBTTag object.
+    """
+
+    # Read and parse tag type into enum member.
+    byte_tag_type = __read_nbt_int(file, 1)
+    tag_type = TagTypes(byte_tag_type)
+
+    return __parse_tag_content(file, tag_type)
+
+
+def _write_tag(file, nbt_tag: NBTTag) -> None:
     """
     Write NBTTag into the open file pointer.
     :param file: Open file pointer.

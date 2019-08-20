@@ -71,12 +71,6 @@ class NBTTag:
         self.parent = None
         self.list_type = None
 
-    def find_children(self, name, type):
-        pass
-
-    def find_child(self, name, type, throw_on_duplicate=False):
-        pass
-
     @staticmethod
     def create(type, name, payload, parent=None):
         tag = NBTTag()

@@ -1,7 +1,9 @@
-from nbt_py.core import NBTTag, TagTypes
+from typing import Dict, Any
+
+from nbt_py.core import NBTTag, TagTypes, FULLY_QUALIFIED_SEPARATOR
 
 
-def is_gzipped(filepath):
+def is_gzipped(filepath: str) -> bool:
     """
     Check if the file at given path is gzip encoded.
     :param filepath: File path to check.
@@ -14,7 +16,7 @@ def is_gzipped(filepath):
     return first_two_bytes == MAGIC_NUMBER
 
 
-def nbt_to_dict(nbt_tag: NBTTag):
+def nbt_to_dict(nbt_tag: NBTTag) -> Dict[str, Any]:
     """
     Convert NBT tag into python dictionary.
     All NBT compound types will be transformed into nested Python dictionaries.
@@ -31,7 +33,7 @@ def nbt_to_dict(nbt_tag: NBTTag):
     return result
 
 
-def __get_full_qualified_name(nb_tag, FULLY_QUALIFIED_SEPARATOR=None):
+def _get_full_qualified_name(nb_tag: NBTTag, separator: str = FULLY_QUALIFIED_SEPARATOR) -> str:
     """
     Get a fully qualified name for an NBT tag. It will include all parents' names separated
     with underscore except the root tag.
@@ -43,7 +45,7 @@ def __get_full_qualified_name(nb_tag, FULLY_QUALIFIED_SEPARATOR=None):
     current_tag = nb_tag
     name = current_tag.name
     while current_tag.parent and current_tag.parent.name:
-        name = f'{current_tag.parent.name}{FULLY_QUALIFIED_SEPARATOR}{name}'
+        name = f'{current_tag.parent.name}{separator}{name}'
         current_tag = current_tag.parent
 
     return name

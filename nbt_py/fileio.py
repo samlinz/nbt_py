@@ -1,32 +1,17 @@
 import gzip
 import os
 
-from nbt_py.nbtio import __write_tag, __parse_tag
+from nbt_py.core import NBTTag
+from nbt_py.nbtio import _write_tag, _read_tag
 from nbt_py.util import is_gzipped
 
 
-def __get_backup_filepath(base):
-    """
-    Find an unused name for the backup file.
-    :param base: Base name for the backup files.
-    :return: Filepath that does not exists, for the backup file.
-    """
-
-    number = 0
-    filepath = None
-    continue_search = True
-    while continue_search:
-        filepath = f'{base}{number if number > 0 else ""}'
-        if os.path.exists(filepath):
-            continue_search = True
-            number += 1
-        else:
-            continue_search = False
-
-    return filepath
-
-
-def save_nbt_file(nbt_tag, filepath: str, *, gzipped=True, override=False, create_backup=True):
+def save_nbt_file(nbt_tag: NBTTag
+                  , filepath: str
+                  , *
+                  , gzipped: bool = True
+                  , override: bool = False
+                  , create_backup: bool = True) -> None:
     """
     Save the NBT tag into file in binary format.
     Preferably the tag loaded with loading functions and modified with relevant functions.
@@ -57,7 +42,7 @@ def save_nbt_file(nbt_tag, filepath: str, *, gzipped=True, override=False, creat
             file = open(filepath, mode='wb')
 
         with file:
-            __write_tag(file, nbt_tag)
+            _write_tag(file, nbt_tag)
     except Exception as e:
         # Remove invalid file.
         if os.path.exists(filepath):
@@ -74,7 +59,7 @@ def save_nbt_file(nbt_tag, filepath: str, *, gzipped=True, override=False, creat
             os.remove(backup_created)
 
 
-def load_and_parse_nbt_file(filepath: str, *, return_gzipped=False):
+def load_and_parse_nbt_file(filepath: str, *, return_gzipped: bool = False) -> NBTTag:
     """
     Load a compressed or uncompressed NBT file and parse it into NBTTag object.
 
@@ -95,6 +80,27 @@ def load_and_parse_nbt_file(filepath: str, *, return_gzipped=False):
 
     # Parse the file into NBTTag.
     with file:
-        result = __parse_tag(file)
+        result = _read_tag(file)
 
     return (result, gzipped) if return_gzipped else result
+
+
+def __get_backup_filepath(base: str) -> str:
+    """
+    Find an unused name for the backup file.
+    :param base: Base name for the backup files.
+    :return: Filepath that does not exists, for the backup file.
+    """
+
+    number = 0
+    filepath = None
+    continue_search = True
+    while continue_search:
+        filepath = f'{base}{number if number > 0 else ""}'
+        if os.path.exists(filepath):
+            continue_search = True
+            number += 1
+        else:
+            continue_search = False
+
+    return filepath
