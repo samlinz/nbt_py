@@ -18,7 +18,7 @@ its data. It can be quite difficult to work with and this tool simplifies that p
 
 Check docstrings and examples for how to use.
 
-```python
+```
 nbt_py.fileio.load_and_parse_nbt_file
 nbt_py.fileio.save_nbt_file
 nbt_py.filter.find_tags
@@ -28,7 +28,7 @@ nbt_py.util.nbt_to_dict
 ```
 
 NBT tags are represented as NBTTag objects which have following properties:
-```python
+```
 name -> Name of the tag
 type -> Type of the tag as TagTypes enumeration
 parent -> Reference to the parent of the tag, None for root
